@@ -1,0 +1,29 @@
+#if($task)
+<h1>Edit Task</h1>
+
+<h4>$task.getDescription()</h4>
+<a type="button" href="/tasks/$task.getId()/delete" class="btn btn-danger">Delete $task.getDescription()</a>
+
+<form class="form-inline" action="/tasks/$task.getId()" method="post">
+  <div class="form-group">
+    <label for="updateName">Enter New Task name</label>
+    <input class="form-control" type="text" name="updateName" id="updateName">
+  </div>
+  <button type="submit" id="editName" class="btn btn-warning">Submit</button>
+</form>
+#else
+<h1>Edit Category</h1>
+
+<h4>$category.getName()</h4>
+<a type="button" href="/categories/$category.getId()/delete" class="btn btn-danger">Delete $category.getName()</a>
+
+<form class="form-inline" action="/categories/$category.getId()" method="post">
+  <div class="form-group">
+    <label for="updateCategoryName">Enter New Category name</label>
+    <input class="form-control" type="text" name="updateCategoryName" id="updateCategoryName">
+  </div>
+  <button type="submit" id="editCategoryName" class="btn btn-warning">Submit</button>
+</form>
+
+
+#end
