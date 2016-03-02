@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class Book {
   private int id;
   private String title;
-  private int copies;
 
 
   public int getId() {
@@ -16,13 +15,9 @@ public class Book {
     return title;
   }
 
-  public int getCopies() {
-    return copies;
-  }
 
-  public Book(String title, int copies) {
+  public Book(String title) {
     this.title = title;
-    this.copies = copies;
   }
 
   public static List<Book> all() {
@@ -44,8 +39,8 @@ public class Book {
 
   public void save() {
     try(Connection con = DB.sql2o.open()) {
-      String sql = "INSERT INTO books(title, copies) VALUES (:title, :copies)";
-      this.id= (int) con.createQuery(sql, true).addParameter("title", this.title).addParameter("copies", this.copies).executeUpdate().getKey();
+      String sql = "INSERT INTO books(title) VALUES (:title)";
+      this.id= (int) con.createQuery(sql, true).addParameter("title", this.title).executeUpdate().getKey();
     }
   }
 
@@ -59,12 +54,11 @@ public class Book {
     }
   }
 
-  public void update(String title, int copies) {
+  public void update(String title) {
     this.title = title;
-    this.copies = copies;
     try(Connection con = DB.sql2o.open()) {
-      String sql = "UPDATE books SET title = :title, copies = :copies WHERE id= :id";
-      con.createQuery(sql).addParameter("title", title).addParameter("copies", copies).addParameter("id", id).executeUpdate();
+      String sql = "UPDATE books SET title = :title WHERE id= :id";
+      con.createQuery(sql).addParameter("title", title).addParameter("id", id).executeUpdate();
     }
   }
 
@@ -78,35 +72,36 @@ public class Book {
     }
   }
 
+  public ArrayList<Author> getAuthors() {
+    try(Connection con = DB.sql2o.open()) {
+      String sql = "SELECT DISTINCT author_id FROM books_authors WHERE book_id = :book_id";
+      List<Integer> authorIds = con.createQuery(sql)
+        .addParameter("book_id", this.getId())
+        .executeAndFetch(Integer.class);
+
+      ArrayList<Author> authors = new ArrayList<Author>();
+
+      for (Integer authorId : authorIds) {
+        String authorQuery = "SELECT * FROM authors WHERE id = :authorId";
+        Author author = con.createQuery(authorQuery)
+          .addParameter("authorId", authorId)
+          .executeAndFetchFirst(Author.class);
+          authors.add(author);
+      }
+    return authors;
+    }
+  }
+
 
     public static List<Book> bookSearch(String bookTitle) {
     try(Connection con = DB.sql2o.open()) {
-      String sql = "SELECT * FROM books_authors WHERE title LIKE :bookTitle";
+      String sql = "SELECT * FROM books WHERE title LIKE :bookTitle";
           return con.createQuery(sql)
           .addParameter("bookTitle", bookTitle)
           .executeAndFetch(Book.class);
       }
     }
 
-    public static List<Book> authorSearch(String authorName) {
-    try(Connection con = DB.sql2o.open()) {
-      String sql = "SELECT * FROM books_authors WHERE author LIKE :authorName";
-          return con.createQuery(sql)
-          .addParameter("authorName", authorName)
-          .executeAndFetch(Book.class);
-      }
-    }
-
-
-
-  public List<Author> getAuthors() {
-    try(Connection con = DB.sql2o.open()) {
-      String sql = "SELECT authors.* FROM books JOIN books_authors ON (books.id = books_authors.book_id) JOIN authors ON (books_authors.author_id = authors.id) WHERE books.id = :book_id;";
-        return con.createQuery(sql)
-        .addParameter("book_id", this.getId())
-        .executeAndFetch(Author.class);
-    }
-  }
 
   public void delete() {
     try(Connection con = DB.sql2o.open()) {

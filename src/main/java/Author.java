@@ -20,6 +20,16 @@ public class Author {
   this.name = name;
 }
 
+// public List<Author> getAuthors() {
+//   try(Connection con = DB.sql2o.open()) {
+//     String sql = "SELECT authors.* FROM books JOIN books_authors ON (books.id = books_authors.book_id) JOIN authors ON (books_authors.author_id = authors.id) WHERE books.id = :book_id;";
+//       return con.createQuery(sql)
+//       .addParameter("book_id", this.getId())
+//       .executeAndFetch(Author.class);
+//   }
+// }
+
+
 @Override
 public boolean equals(Object otherAuthor){
   if (!(otherAuthor instanceof Author)) {
@@ -68,12 +78,32 @@ public boolean equals(Object otherAuthor){
     }
   }
 
-  public List<Book> getBooks() {
+  public ArrayList<Book> getBooks() {
     try(Connection con = DB.sql2o.open()){
-    String sql = "SELECT books.* FROM authors JOIN books_authors ON (authors.id = books_authors.author_id) JOIN books ON (books_authors.book_id = books.id) WHERE authors.id = :author_id;";
-      return con.createQuery(sql)
-      .addParameter("author_id", this.getId())
-      .executeAndFetch(Book.class);
+      String sql = "SELECT DISTINCT book_id FROM books_authors WHERE author_id = :author_id";
+      List<Integer> bookIds = con.createQuery(sql)
+        .addParameter("author_id", this.getId())
+        .executeAndFetch(Integer.class);
+
+      ArrayList<Book> books = new ArrayList<Book>();
+
+      for (Integer bookId : bookIds) {
+          String authorQuery = "Select * From books WHERE id = :bookId";
+          Book book = con.createQuery(authorQuery)
+            .addParameter("bookId", bookId)
+            .executeAndFetchFirst(Book.class);
+          books.add(book);
+      }
+      return books;
+    }
+  }
+
+  public static List<Author> authorSearch(String name) {
+  try(Connection con = DB.sql2o.open()) {
+    String sql = "SELECT * FROM authors WHERE name LIKE :name";
+        return con.createQuery(sql)
+        .addParameter("name", name)
+        .executeAndFetch(Author.class);
     }
   }
 

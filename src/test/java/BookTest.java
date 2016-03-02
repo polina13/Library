@@ -15,55 +15,58 @@ public class BookTest {
 
   @Test
   public void equals_returnsTrueIfBookesAreEqual() {
-    Book firstBook = new Book("book1", 1);
-    Book secondBook = new Book("book1", 1);
+    Book firstBook = new Book("book1");
+    Book secondBook = new Book("book1");
     assertTrue(firstBook.equals(secondBook));
   }
 
   @Test
   public void save_savesIntoDatabase() {
-    Book myBook = new Book("book1", 1);
+    Book myBook = new Book("book1");
     myBook.save();
     assertTrue(Book.all().get(0).equals(myBook));
   }
 
   @Test
   public void find_findBookInDatabase_true() {
-    Book myBook = new Book("book1", 1);
+    Book myBook = new Book("book1");
     myBook.save();
     Book savedBook = Book.find(myBook.getId());
     assertTrue(myBook.equals(savedBook));
   }
 
   @Test
-  public void addAuthor_addsAuthorToBook() {
-    Book myBook = new Book("book1", 1);
+  public void addAuthor_addMultipleAuthorsToBook() {
+    Book myBook = new Book("book1");
     myBook.save();
 
     Author myAuthor = new Author("Jimmy");
     myAuthor.save();
 
+    Author myAuthor2 = new Author("Jimmy2");
+    myAuthor2.save();
+
     myBook.addAuthor(myAuthor);
-    Author savedAuthor = myAuthor.getAuthors().get(0);
-    assertTrue(myAuthor.equals(savedAuthor));
+    myBook.addAuthor(myAuthor2);
+    List savedAuthors = myBook.getAuthors();
+    assertEquals(savedAuthors.size(), 2);
   }
 
   @Test
   public void getAuthors_returnsAllAuthors_ArrayList() {
-    Book myBook = new Book("book1", 1);
+    Book myBook = new Book("book1");
     myBook.save();
 
     Author myAuthor = new Author("Jimmy");
     myAuthor.save();
 
     myBook.addAuthor(myAuthor);
-    List savedAuthors = myBook.getAuthors();
-    assertEquals(savedAuthors.size(), 1);
+    assertEquals(myBook.getAuthors().size(), 1);
   }
 
   @Test
-  public void delete_deletesAllTasksAndListsAssoicationes() {
-    Book myBook = new Book("book1", 1);
+  public void delete_deletesBook() {
+    Book myBook = new Book("book1");
     myBook.save();
 
     Author myAuthor = new Author("Jimmy");
@@ -76,10 +79,10 @@ public class BookTest {
 
   @Test
   public void testsTitleSearch() {
-    Book myBook = new Book("book1", 1);
+    Book myBook = new Book("book1");
     myBook.save();
 
-    Book myBook2 = new Book("book2", 1);
+    Book myBook2 = new Book("book2");
     myBook2.save();
 
     String bookName = "book1";
@@ -91,16 +94,14 @@ public class BookTest {
 
   @Test
   public void testsAuthorSearch() {
-    Book myBook21 = new Book("book21", 1);
-    myBook21.save();
 
-    Book myBook4 = new Book("book4", 1);
-    myBook4.save();
+    Author myAuthor3 = new Author("Joe");
+    myAuthor3.save();
 
-    String authorName = "Joe";
-    List authorsFound = Book.authorSearch(authorName);
+    String name = "Joe";
+    List authorsFound = Author.authorSearch(name);
 
     assertEquals(authorsFound.size(), 1);
-    assertEquals(authorsFound.get(0), myBook21);
+    assertEquals(authorsFound.get(0), myAuthor3);
   }
 }

@@ -44,7 +44,7 @@ public class AuthorTest {
 
   @Test
   public void addBook_addsBookToAuthor() {
-    Book myBook = new Book("book1", 1);
+    Book myBook = new Book("book1");
     myBook.save();
 
     Author myAuthor = new Author("Jimmy");
@@ -57,7 +57,7 @@ public class AuthorTest {
 
   @Test
   public void getBooks_returnsAllBooks_List() {
-    Book myBook = new Book("book1", 1);
+    Book myBook = new Book("book1");
     myBook.save();
 
     Author myAuthor = new Author("Jimmy");
@@ -70,7 +70,7 @@ public class AuthorTest {
 
   @Test
   public void delete_deletesAllAuthorsAndBookAssociations() {
-    Book myBook = new Book("book1", 1);
+    Book myBook = new Book("book1");
     myBook.save();
 
     Author myAuthor = new Author("Jimmy");
