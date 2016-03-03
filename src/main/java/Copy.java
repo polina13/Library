@@ -84,7 +84,7 @@ public class Copy {
   }
 
 
-  public List<Patron> getPatrons() {
+  public List<Patron> getPatron() {
     try(Connection con = DB.sql2o.open()) {
       String sql = "SELECT patrons.* FROM copies JOIN copies_patrons ON (copies.id = copies_patrons.copy_id) JOIN patrons ON (copies_patrons.patron_id = patrons.id) WHERE copies.id = :copy_id;";
         return con.createQuery(sql)
